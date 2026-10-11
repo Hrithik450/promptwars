@@ -56,17 +56,20 @@ export function Header({
               >
                 AI Firewall
               </Badge>
-              {trustInfo && (
-                <Badge
-                  className={`text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 ${
-                    trustInfo.trustLevel === "TRUSTED"
-                      ? "bg-white text-black hover:bg-zinc-200"
-                      : "bg-zinc-900 text-zinc-300 border border-zinc-700"
-                  }`}
-                >
-                  {trustInfo.trustLevel} ({trustInfo.trustScore}%)
-                </Badge>
-              )}
+              {(() => {
+                const info = trustInfo ?? { trustLevel: "TRUSTED", trustScore: 100 };
+                return (
+                  <Badge
+                    className={`text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 ${
+                      info.trustLevel === "TRUSTED"
+                        ? "bg-white text-black hover:bg-zinc-200"
+                        : "bg-zinc-900 text-zinc-300 border border-zinc-700"
+                    }`}
+                  >
+                    {info.trustLevel} ({info.trustScore}%)
+                  </Badge>
+                );
+              })()}
             </div>
             <p className="text-xs text-zinc-500 hidden sm:flex items-center gap-2 mt-0.5">
               <span>6-Layer Defense-in-Depth</span>
@@ -97,8 +100,8 @@ export function Header({
           })}
         </nav>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+        {/* Action Controls - Space preserved across all routes */}
+        <div className="flex items-center gap-2 self-end md:self-center shrink-0 w-[236px] justify-end">
           {onOpenBenchmark && (
             <Button
               variant="outline"
