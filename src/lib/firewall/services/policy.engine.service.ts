@@ -5,6 +5,9 @@ import { IntentResult } from "../types/intent.parser.types";
 import { PolicyDecision, PolicyRuleName } from "../types/policy.engine.types";
 import { SessionLimiterService } from "./session.limiter.service";
 
+const DISCLOSURE_REGEX =
+  /(system prompt|internal configuration|api keys?|reveal your prompt|show instructions|training data|internal instructions)/i;
+
 export class PolicyEngineService {
   static evaluate(
     normalizedInput: NormalizedInput,
@@ -25,17 +28,7 @@ export class PolicyEngineService {
     }
 
     const lowerText = normalizedInput.normalized.toLowerCase();
-    const disclosureKeywords = [
-      "system prompt",
-      "internal configuration",
-      "api key",
-      "api keys",
-      "reveal your prompt",
-      "show instructions",
-      "training data",
-      "internal instructions",
-    ];
-    if (disclosureKeywords.some((kw) => lowerText.includes(kw))) {
+    if (DISCLOSURE_REGEX.test(lowerText)) {
       triggeredPolicies.push("NO_SYSTEM_DISCLOSURE");
       reasons.push("Request probes for confidential system prompt or internal configuration.");
     }

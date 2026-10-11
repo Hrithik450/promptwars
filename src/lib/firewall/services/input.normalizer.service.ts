@@ -15,6 +15,16 @@ import {
   normalizeLeetspeak,
 } from "./input.decoder.utils";
 
+const NON_ASCII_REGEX = /[^\x00-\x7F]/;
+const ZERO_WIDTH_FAST_CHECK =
+  /[\u200B\u200C\u200D\uFEFF\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\u00AD\u034F\u180E]/;
+const WHITESPACE_COLLAPSE_1 = /[\r\n\t\f\v\u00A0\u3000]+/g;
+const WHITESPACE_COLLAPSE_2 = /\s{2,}/g;
+const HOMOGLYPH_REGEX = new RegExp(
+  "[" + Object.keys(HOMOGLYPH_MAP).join("") + "]",
+  "g",
+);
+
 export class InputNormalizerService {
   static normalize(
     rawInput: string,
@@ -31,35 +41,41 @@ export class InputNormalizerService {
     const flags = new Set<NormalizerFlag>();
     const decodedPayloads: string[] = [];
 
-    const zeroWidthMatches = original.match(ZERO_WIDTH_REGEX);
-    const strippedZeroWidthCount = zeroWidthMatches ? zeroWidthMatches.length : 0;
-    if (strippedZeroWidthCount > 0) {
-      flags.add("ZERO_WIDTH_CHARS");
-      flags.add("OBFUSCATION_DETECTED");
-    }
-    let current = original.replace(ZERO_WIDTH_REGEX, "");
+    let strippedZeroWidthCount = 0;
+    let current = original;
 
-    current = current.normalize("NFKC");
-
-    if (normalizeHomoglyphs) {
-      let homoglyphsReplaced = 0;
-      let homoglyphReplacedText = "";
-      for (const char of current) {
-        if (HOMOGLYPH_MAP[char]) {
-          homoglyphReplacedText += HOMOGLYPH_MAP[char];
-          homoglyphsReplaced++;
-        } else {
-          homoglyphReplacedText += char;
-        }
+    if (ZERO_WIDTH_FAST_CHECK.test(original)) {
+      const zeroWidthMatches = original.match(ZERO_WIDTH_REGEX);
+      strippedZeroWidthCount = zeroWidthMatches ? zeroWidthMatches.length : 0;
+      if (strippedZeroWidthCount > 0) {
+        flags.add("ZERO_WIDTH_CHARS");
+        flags.add("OBFUSCATION_DETECTED");
+        current = original.replace(ZERO_WIDTH_REGEX, "");
       }
+    }
+
+    if (NON_ASCII_REGEX.test(current)) {
+      current = current.normalize("NFKC");
+    }
+
+    if (normalizeHomoglyphs && NON_ASCII_REGEX.test(current)) {
+      let homoglyphsReplaced = 0;
+      current = current.replace(HOMOGLYPH_REGEX, (char) => {
+        homoglyphsReplaced++;
+        return HOMOGLYPH_MAP[char] || char;
+      });
       if (homoglyphsReplaced > 0) {
         flags.add("HOMOGLYPH_REPLACED");
         flags.add("OBFUSCATION_DETECTED");
-        current = homoglyphReplacedText;
       }
     }
 
-    const detectedScripts = this.getDetectedScripts(original);
+    const detectedScripts = NON_ASCII_REGEX.test(original)
+      ? this.getDetectedScripts(original)
+      : /[a-zA-Z]/.test(original)
+        ? ["Latin"]
+        : [];
+
     if (detectedScripts.length > 1) {
       const hasLatin = detectedScripts.includes("Latin");
       const hasConfusable =
@@ -108,8 +124,8 @@ export class InputNormalizerService {
     }
 
     current = current
-      .replace(/[\r\n\t\f\v\u00A0\u3000]+/g, " ")
-      .replace(/\s{2,}/g, " ")
+      .replace(WHITESPACE_COLLAPSE_1, " ")
+      .replace(WHITESPACE_COLLAPSE_2, " ")
       .trim();
 
     return {

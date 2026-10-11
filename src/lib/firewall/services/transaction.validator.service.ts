@@ -10,6 +10,7 @@ import {
 export class TransactionValidatorService {
   public static readonly MAX_SINGLE_TRANSFER = 10000;
   public static readonly DEFAULT_AUTHENTICATED_USER = "alex_mercer";
+  private static readonly RECIPIENT_FORMAT_REGEX = /^[a-zA-Z0-9_\.-]{3,30}$/;
 
   /**
    * Validates parsed intent and parameters against hard business rules
@@ -94,7 +95,7 @@ export class TransactionValidatorService {
 
         // 6. Recipient format (alphanumeric, dots, underscores, hyphens, 3-30 chars)
         const isValidFormat =
-          /^[a-zA-Z0-9_\.-]{3,30}$/.test(cleanRecipient);
+          this.RECIPIENT_FORMAT_REGEX.test(cleanRecipient);
         if (!isValidFormat) {
           validationErrors.push({
             rule: "INVALID_RECIPIENT",

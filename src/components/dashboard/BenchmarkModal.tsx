@@ -24,10 +24,12 @@ export function BenchmarkModal({ isOpen, onClose }: BenchmarkModalProps) {
   const runBenchmark = async () => {
     setIsRunning(true);
     setProgress(0);
-    const itemResults: BenchmarkItemResult[] = [];
+    const total = QUICK_PRESETS.length;
+    let completed = 0;
+    const itemResults: BenchmarkItemResult[] = new Array(total);
 
-    for (let i = 0; i < QUICK_PRESETS.length; i++) {
-      const preset = QUICK_PRESETS[i];
+    const executePreset = async (index: number) => {
+      const preset = QUICK_PRESETS[index];
       try {
         const res = await fetch("/api/analyze", {
           method: "POST",
@@ -40,25 +42,36 @@ export function BenchmarkModal({ isOpen, onClose }: BenchmarkModalProps) {
 
         const data = await res.json();
         const actualVerdict = data.verdict as "APPROVED" | "BLOCKED";
-        itemResults.push({
+        itemResults[index] = {
           preset,
           actualVerdict,
           riskScore: data.riskScore,
           passed: actualVerdict === preset.expectedVerdict,
-        });
+        };
       } catch {
-        itemResults.push({
+        itemResults[index] = {
           preset,
           actualVerdict: "BLOCKED",
           riskScore: 1.0,
           passed: preset.expectedVerdict === "BLOCKED",
-        });
+        };
       }
 
-      setResults([...itemResults]);
-      setProgress(Math.round(((i + 1) / QUICK_PRESETS.length) * 100));
-    }
+      completed++;
+      setResults(itemResults.filter(Boolean));
+      setProgress(Math.round((completed / total) * 100));
+    };
 
+    const concurrency = Math.min(4, total);
+    let queueIdx = 0;
+    const workers = Array.from({ length: concurrency }, async () => {
+      while (queueIdx < total) {
+        const idx = queueIdx++;
+        await executePreset(idx);
+      }
+    });
+
+    await Promise.all(workers);
     setIsRunning(false);
   };
 

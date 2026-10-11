@@ -17,9 +17,12 @@ export class SessionLimiterService {
     }
 
     const fiveMinutesAgo = now - 300000;
-    state.requestTimestamps = state.requestTimestamps.filter(
-      (ts) => ts > fiveMinutesAgo,
-    );
+    while (
+      state.requestTimestamps.length > 0 &&
+      state.requestTimestamps[0] <= fiveMinutesAgo
+    ) {
+      state.requestTimestamps.shift();
+    }
     state.requestTimestamps.push(now);
 
     if (state.requestTimestamps.length > 20) {

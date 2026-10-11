@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { PromptConsole } from "@/components/dashboard/PromptConsole";
 import { VerdictPanel } from "@/components/dashboard/VerdictPanel";
@@ -24,7 +24,7 @@ export default function Home() {
 
   const { stats, history, fetchStats, clearSession } = useFirewallSession();
 
-  const handleSubmit = async (textToSubmit?: string) => {
+  const handleSubmit = useCallback(async (textToSubmit?: string) => {
     const payload = (textToSubmit ?? input).trim();
     if (!payload || isLoading) return;
 
@@ -71,24 +71,24 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, fetchStats]);
 
-  const handleClearSession = async () => {
+  const handleClearSession = useCallback(async () => {
     await clearSession();
     setCurrentVerdict(null);
     setSelectedRequestId(undefined);
-  };
+  }, [clearSession]);
 
-  const handleExportAuditLog = () => {
+  const handleExportAuditLog = useCallback(() => {
     const link = document.createElement("a");
     link.href = "/api/export";
     link.setAttribute("download", `banksim-audit-${Date.now()}.json`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+  }, []);
 
-  const handleSelectRecord = (record: AuditRecord) => {
+  const handleSelectRecord = useCallback((record: AuditRecord) => {
     setSelectedRequestId(record.requestId);
     setInput(record.userInput);
 
@@ -106,7 +106,7 @@ export default function Home() {
       executionResult: record.executionResult,
     };
     setCurrentVerdict(reconstitutedVerdict);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-white selection:text-black">

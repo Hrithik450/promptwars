@@ -114,31 +114,30 @@ export class AuditStoreService {
     let totalRisk = 0;
     const threatBreakdown: Record<string, number> = {};
     const riskLevelBreakdown: Record<string, number> = {};
-
-    // Count consecutive blocks from newest records backwards
     let consecutiveBlocks = 0;
-    for (const r of records) {
-      if (r.verdict === "BLOCKED") {
-        consecutiveBlocks++;
-      } else {
-        break;
-      }
-    }
+    let checkingConsecutive = true;
 
-    for (const r of records) {
+    for (let i = 0; i < total; i++) {
+      const r = records[i];
       if (r.verdict === "APPROVED") {
         approved++;
+        checkingConsecutive = false;
       } else {
         blocked++;
+        if (checkingConsecutive) {
+          consecutiveBlocks++;
+        }
       }
 
       totalRisk += r.riskScore;
 
       if (r.threatCategory && r.threatCategory !== "NONE") {
-        threatBreakdown[r.threatCategory] = (threatBreakdown[r.threatCategory] || 0) + 1;
+        threatBreakdown[r.threatCategory] =
+          (threatBreakdown[r.threatCategory] || 0) + 1;
       }
 
-      riskLevelBreakdown[r.riskLevel] = (riskLevelBreakdown[r.riskLevel] || 0) + 1;
+      riskLevelBreakdown[r.riskLevel] =
+        (riskLevelBreakdown[r.riskLevel] || 0) + 1;
     }
 
     // Adaptive Trust Calculation

@@ -36,14 +36,14 @@ export const agentProvider = createRoutingGoogleProvider({
   apiKeys: allKeys,
   label: "textGeneration",
 });
-export const defaultAgentModel = agentProvider("gemini-2.5-flash");
+export const defaultAgentModel = agentProvider("gemini-3.5-flash");
 
 export const titleProvider = createRoutingGoogleProvider({
   models: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"],
   apiKeys: allKeys,
   label: "titleGeneration",
 });
-export const defaultTitleModel = titleProvider("gemini-2.5-flash");
+export const defaultTitleModel = titleProvider("gemini-3.5-flash");
 
 export const classifierProvider = createRoutingGoogleProvider({
   models: [
@@ -55,4 +55,4 @@ export const classifierProvider = createRoutingGoogleProvider({
   apiKeys: allKeys,
   label: "threatClassifier",
 });
-export const defaultClassifierModel = classifierProvider("gemini-2.5-flash");
+export const defaultClassifierModel = classifierProvider("gemini-3.5-flash");

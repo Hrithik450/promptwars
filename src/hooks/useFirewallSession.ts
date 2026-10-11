@@ -50,11 +50,11 @@ export function useFirewallSession() {
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-    const init = async () => {
+    let active = true;
+    const load = async () => {
       try {
         const res = await fetch("/api/stats");
-        if (res.ok && isMounted) {
+        if (res.ok && active) {
           const data = await res.json();
           setStats({
             totalRequests: data.totalRequests ?? 0,
@@ -75,10 +75,9 @@ export function useFirewallSession() {
         // Fail-safe fallback
       }
     };
-
-    init();
+    load();
     return () => {
-      isMounted = false;
+      active = false;
     };
   }, []);
 
