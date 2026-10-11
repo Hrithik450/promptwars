@@ -1,0 +1,82 @@
+# SentinAL AI Defense Firewall (PromptWars)
+
+> SentinAL is an enterprise-grade, deterministic, four-layer AI security gateway engineered to shield autonomous financial and banking agents against prompt injection, canary token extraction, adversarial jailbreaks, and state-drift attacks in under 5 milliseconds.
+
+## System Overview
+- **Product**: SentinAL / PromptWars
+- **Domain**: Financial Security / AI Gateway / Autonomous Agent Firewalls
+- **Inspection Latency**: Median < 5ms (P99 < 15ms)
+- **Compliance Coverage**: OWASP Top 10 for Large Language Model Applications (LLM01-LLM10)
+- **Deployment**: Edge Middleware, Next.js Serverless Route Handlers, Microservice Proxies
+
+## Defense Architecture (4 Hierarchical Inspection Layers)
+
+### Layer 1: Deterministic Heuristic & Normalization Engine
+- **ASCII & Homoglyph Normalization**: Strips zero-width spaces (`\u200B`, `\u200C`, `\u200D`), bidirectional override Unicode (`\u202E`), Cyrillic/Greek homoglyph substitutions, and encoded escape payloads.
+- **Pattern Signatures**: Instant regex matching for known jailbreaks (DAN, Developer Mode, AIM, hypothetical evil AI roleplay, base64 payload triggers).
+- **Early Rejection**: Over 90% of commodity injections blocked in under 0.8ms without downstream model overhead.
+
+### Layer 2: Adversarial Semantic Intent Parser
+- **Intent Extraction**: Distinguishes authentic banking operations (wire transfers, account balances, transaction history, KYC status) from conversational deception and evasive syntax.
+- **Dual-Threshold Confidence Calibration**:
+  - `CONFIDENCE < 0.60`: Escalate to deeper inspection or reject ambiguous intents.
+  - `CONFIDENCE >= 0.85`: High-certainty approval path with zero false-alarm disruption.
+- **Risk Score Formulation**: Composite risk index scaled 0 to 100 based on adversarial token density, obfuscation markers, and sentiment anomalies.
+
+### Layer 3: Strict Banking Policy Engine
+- **Financial Rule Constraints**:
+  - Max single transfer limit: $10,000 USD (transactions exceeding threshold require step-up MFA or immediate quarantine).
+  - High-risk destination accounts: Automatic validation against sanctioned and untrusted payee hashes.
+  - Velocity throttles: High-frequency transaction bursts flag immediate anomalous behavior penalties.
+- **Canary Defense & Data Leak Prevention**:
+  - Dynamic canary injection tracking to detect prompt leakage.
+  - Strict pattern matching blocking credit card numbers, SSNs, and secret tokens in model output.
+
+### Layer 4: Session Drift & Contextual Reputation Tracker
+- **Multi-Turn State Analysis**: Tracks cumulative session risk across conversational turns.
+- **Exponential Penalty Backoff**: Probing questions and incremental boundary testing accumulate risk velocity, triggering automated rate-limiting or session revocation.
+- **Reputation Scoring**: Real-time sliding window evaluating user credibility from 0 to 100.
+
+## API Endpoints
+
+### 1. `POST /api/firewall`
+Primary security proxy endpoint. Inspects incoming user prompts through all 4 layers before forwarding to agent execution.
+- **Request Body**:
+  ```json
+  {
+    "prompt": "Transfer $500 to Alice for invoice #102",
+    "sessionId": "sess_f89a2b",
+    "conversationHistory": []
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "verdict": "APPROVED",
+    "riskScore": 12,
+    "confidence": 0.94,
+    "latencyMs": 3.8,
+    "intent": { "action": "TRANSFER", "amount": 500, "recipient": "Alice" },
+    "layerResults": {
+      "layer1Heuristics": { "passed": true },
+      "layer2Intent": { "passed": true },
+      "layer3Policy": { "passed": true },
+      "layer4Drift": { "passed": true }
+    }
+  }
+  ```
+
+### 2. `POST /api/chat`
+Autonomous agent routing endpoint. Evaluates prompt safety, processes approved financial queries, routes ambiguous queries to Gemini AI reasoning models, and returns sanitized conversational responses.
+
+### 3. `GET /api/benchmark`
+Runs automated 30-scenario confusion matrix evaluating true positive detection rate on complex adversarial jailbreaks and false positive rate on benign financial queries.
+
+### 4. `GET /api/export`
+Exports RFC-4180 compliant CSV audit log containing detailed inspection verdicts, layer execution timings, detected attack vectors, and session telemetry.
+
+## Key Resources
+- [Main Dashboard](https://promptwars.io)
+- [Audit Export API](https://promptwars.io/api/export)
+- [XML Sitemap](https://promptwars.io/sitemap.xml)
+- [Robots Configuration](https://promptwars.io/robots.txt)
