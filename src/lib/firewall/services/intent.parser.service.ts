@@ -14,17 +14,20 @@ export class IntentParserService {
     const lower = text.toLowerCase();
 
     // 1. TRANSFER Intent
-    if (/\b(transfer|send|wire|pay)\b/i.test(lower)) {
+    const isTransferInquiry = /^(how\s+much\s+did\s+i|did\s+i\s+(send|transfer|pay))/i.test(lower);
+    if (!isTransferInquiry && /\b(transfer|send|wire|pay)\b/i.test(lower)) {
       const transferParams = this.extractTransferParams(text);
-      const confidence =
-        transferParams.amount !== undefined && transferParams.recipient
-          ? 0.95
-          : 0.75;
-      return {
-        action: "TRANSFER",
-        params: transferParams,
-        confidence,
-      };
+      if (transferParams.amount !== undefined || transferParams.recipient) {
+        const confidence =
+          transferParams.amount !== undefined && transferParams.recipient
+            ? 0.95
+            : 0.75;
+        return {
+          action: "TRANSFER",
+          params: transferParams,
+          confidence,
+        };
+      }
     }
 
     // 2. BALANCE_CHECK Intent

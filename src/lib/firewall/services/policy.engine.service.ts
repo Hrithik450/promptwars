@@ -72,10 +72,20 @@ export class PolicyEngineService {
     // --- POLICY 1: DENY_BY_DEFAULT ---
     const isL1HighRisk = layer1Result.layer1RiskScore > 0.6;
     const isL2NonBenign = semanticResult.category !== "BENIGN";
-    const isUnknownIntent = intentResult.action === "UNKNOWN";
+
+    // If intent is UNKNOWN, but L1 is clean (<0.3) and L2 is BENIGN, route to AI agent model
+    const isConversationalSafe =
+      intentResult.action === "UNKNOWN" &&
+      layer1Result.layer1RiskScore < 0.3 &&
+      semanticResult.category === "BENIGN";
+
     const hasBlockingValidation = intentResult.validationErrors.some(
-      (e) => e.severity === "BLOCK",
+      (e) =>
+        e.severity === "BLOCK" &&
+        !(isConversationalSafe && e.rule === "AMBIGUOUS_INTENT"),
     );
+
+    const isUnknownIntent = intentResult.action === "UNKNOWN" && !isConversationalSafe;
 
     if (isL1HighRisk || isL2NonBenign || isUnknownIntent || hasBlockingValidation) {
       triggeredPolicies.push("DENY_BY_DEFAULT");
@@ -90,7 +100,7 @@ export class PolicyEngineService {
     const l1Approves = layer1Result.layer1RiskScore < 0.3;
     const l2Approves =
       semanticResult.category === "BENIGN" && semanticResult.confidence >= 0.7;
-    const intentApproves = intentResult.isApproved;
+    const intentApproves = intentResult.isApproved || isConversationalSafe;
 
     const fullConsensus = l1Approves && l2Approves && intentApproves;
 

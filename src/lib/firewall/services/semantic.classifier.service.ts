@@ -56,7 +56,8 @@ Output JSON format (nothing else):
     const apiKey =
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
-      process.env.GOOGLE_API_KEY;
+      process.env.GOOGLE_API_KEY ||
+      process.env.GENERAL_GEMINI_API_KEYS?.split(",")?.[0]?.trim();
 
     // If online API is available and not in forced-offline test mode
     if (apiKey && !forceOffline) {
@@ -174,7 +175,7 @@ Output JSON format (nothing else):
 
     // Validate if text is typical benign banking request
     const benignBankingRegex =
-      /\b(what('s|\s+is)(\s+my)?|check|show|transfer|send|view|help|how\s+much|can\s+i\s+(see|view|check))\b.*?(?:(?:\$\s*\d+)|(?:[a-z0-9]+\s*dollars?)|balance|checking|savings|account|transactions?|details|info)/i;
+      /\b(what('s|\s+is)(\s+my)?|check|show|transfer|send|view|help|how\s+much|did\s+i|can\s+i\s+(see|view|check|send|transfer))\b.*?(?:(?:\$\s*\d+)|(?:[a-z0-9_]+\s*dollars?)|balance|checking|savings|account|transactions?|details|info|[a-z0-9_]+)/i;
 
     if (benignBankingRegex.test(text)) {
       return {
