@@ -22,8 +22,8 @@ export function Header({
   trustInfo,
 }: HeaderProps) {
   return (
-    <header className="border-b border-zinc-800 bg-black/90 backdrop-blur-md sticky top-0 z-40 px-4 py-3.5 sm:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <header className="border-b border-zinc-800 bg-black/90 backdrop-blur-md sticky top-0 z-40 w-full">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         {/* Brand & Identity */}
         <div className="flex items-center gap-3">
           <div className="size-9 bg-white text-black rounded-lg flex items-center justify-center font-bold shadow-sm">
