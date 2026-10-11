@@ -159,6 +159,7 @@ export default function Home() {
       inputSanitized: record.sanitizedInput,
       parsedIntent: record.parsedIntent ?? null,
       layerDetails: record.layerDetails,
+      executionResult: record.executionResult,
     };
     setCurrentVerdict(reconstitutedVerdict);
   };

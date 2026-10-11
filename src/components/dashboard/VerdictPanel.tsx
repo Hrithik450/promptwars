@@ -131,6 +131,24 @@ export function VerdictPanel({ verdict, isLoading }: VerdictPanelProps) {
           </p>
         </div>
 
+        {/* Sentinel AI Agent Response Box */}
+        {isApproved && verdict.executionResult && verdict.executionResult.message && (
+          <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-zinc-700/90 text-xs font-mono flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-white font-semibold uppercase text-[11px] tracking-wider flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                Sentinel AI Assistant Response
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-black border border-zinc-700 text-zinc-300 font-mono">
+                Gemini 2.5 Multi-Turn
+              </span>
+            </div>
+            <p className="text-zinc-200 font-sans text-xs sm:text-sm leading-relaxed whitespace-pre-wrap pt-0.5">
+              {verdict.executionResult.message}
+            </p>
+          </div>
+        )}
+
         {/* Attack Explanation Mode (Bonus 7B) */}
         {!isApproved && (
           <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-700/80 flex flex-col gap-2.5 text-xs font-mono">

@@ -17,6 +17,7 @@ export interface AuditRecord {
   parsedIntent?: FirewallVerdictResponse["parsedIntent"];
   layerDetails: LayerDetails;
   timestamp: string;
+  executionResult?: FirewallVerdictResponse["executionResult"];
 }
 
 export interface SessionTrustInfo {
@@ -68,6 +69,7 @@ export class AuditStoreService {
       parsedIntent: verdict.parsedIntent,
       layerDetails: verdict.layerDetails,
       timestamp: verdict.timestamp,
+      executionResult: verdict.executionResult,
     };
 
     this.history.unshift(record);
