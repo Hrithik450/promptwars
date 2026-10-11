@@ -1,3 +1,7 @@
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local", quiet: true });
+dotenv.config({ path: ".env", quiet: true });
+
 import { runNormalizerTests } from "./normalizer.test";
 import { runPatternDetectorTests } from "./pattern.detector.test";
 import { runSemanticClassifierTests } from "./semantic.classifier.test";
