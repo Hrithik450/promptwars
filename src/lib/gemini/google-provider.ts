@@ -196,4 +196,6 @@ export const classifierProvider = createRoutingGoogleProvider({
   apiKeys: allKeys,
   label: "threatClassifier",
 });
-export const defaultClassifierModel = classifierProvider("gemini-2.5-flash");
+export const defaultClassifierModel = classifierProvider(
+  "gemini-3.5-flash-lite",
+);
