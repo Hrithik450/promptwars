@@ -46,6 +46,12 @@ export function loadGoogleApiKeysFromEnv(
   return keys;
 }
 
+export function hasConfiguredGoogleKeys(
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  return loadGoogleApiKeysFromEnv(env).length > 0;
+}
+
 export class GoogleApiKeyPool {
   private readonly keys: string[];
   private readonly cooldownMs: number;
@@ -58,6 +64,10 @@ export class GoogleApiKeyPool {
     this.cooldownMs =
       options?.cooldownMs ??
       Number(process.env.GEMINI_API_KEY_COOLDOWN_MS ?? 60_000);
+  }
+
+  get hasValidKeys(): boolean {
+    return this.keys.length > 0 && this.keys[0] !== "UNCONFIGURED_KEY";
   }
 
   get size(): number {

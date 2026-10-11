@@ -79,6 +79,7 @@ export function PromptConsole({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            aria-label="Banking prompt or security test payload"
             placeholder="Type a banking query or select an adversarial preset below..."
             rows={3}
             disabled={isLoading}
@@ -89,6 +90,7 @@ export function PromptConsole({
               size="sm"
               onClick={() => onSubmit()}
               disabled={!input.trim() || isLoading}
+              aria-label="Submit prompt analysis"
               className="bg-white text-black hover:bg-zinc-200 font-semibold text-xs h-8 px-3.5 rounded-lg shadow-sm font-mono disabled:opacity-30 disabled:bg-zinc-800 disabled:text-zinc-500"
             >
               {isLoading ? (
@@ -118,10 +120,12 @@ export function PromptConsole({
           </div>
 
           {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <div role="tablist" aria-label="Payload categories" className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             {categories.map((cat) => (
               <button
                 key={cat}
+                role="tab"
+                aria-selected={selectedCategory === cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2.5 py-1 rounded-md text-xs font-mono whitespace-nowrap transition-colors ${
                   selectedCategory === cat
@@ -144,6 +148,7 @@ export function PromptConsole({
                   onClick={() => handlePresetClick(preset)}
                   disabled={isLoading}
                   title={preset.description}
+                  aria-label={`Test preset: ${preset.label} (${isBenign ? 'Benign' : 'Attack'})`}
                   className="flex flex-col items-start p-2.5 rounded-lg text-left border border-zinc-800/80 bg-black hover:bg-zinc-900/60 hover:border-zinc-700 transition-all text-xs group"
                 >
                   <div className="flex items-center justify-between w-full gap-1 mb-1">

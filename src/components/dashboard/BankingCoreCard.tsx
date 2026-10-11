@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Building2, Wallet, PiggyBank, CreditCard, Check } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,22 +23,26 @@ export function BankingCoreCard({ lastExecution }: BankingCoreCardProps) {
     credit: "-$450.00",
   });
 
-  const fetchBalances = async () => {
-    try {
-      const res = await fetch("/api/health");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.bankingCore?.accounts) {
-          setBalances(data.bankingCore.accounts);
-        }
-      }
-    } catch {
-      // Fallback
-    }
-  };
-
   useEffect(() => {
-    fetchBalances();
+    let isMounted = true;
+    const syncBalances = async () => {
+      try {
+        const res = await fetch("/api/health");
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          if (data.bankingCore?.accounts) {
+            setBalances(data.bankingCore.accounts);
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    };
+
+    syncBalances();
+    return () => {
+      isMounted = false;
+    };
   }, [lastExecution]);
 
   return (
@@ -71,7 +75,9 @@ export function BankingCoreCard({ lastExecution }: BankingCoreCardProps) {
             <span className="text-sm sm:text-base font-bold text-white font-mono">
               {balances.checking}
             </span>
-            <span className="text-[10px] text-zinc-600 font-mono">**** 4920</span>
+            <span className="text-[10px] text-zinc-600 font-mono">
+              **** 4920
+            </span>
           </div>
 
           <div className="p-3 rounded-lg bg-black border border-zinc-800 flex flex-col gap-1">
@@ -82,7 +88,9 @@ export function BankingCoreCard({ lastExecution }: BankingCoreCardProps) {
             <span className="text-sm sm:text-base font-bold text-white font-mono">
               {balances.savings}
             </span>
-            <span className="text-[10px] text-zinc-600 font-mono">**** 8831</span>
+            <span className="text-[10px] text-zinc-600 font-mono">
+              **** 8831
+            </span>
           </div>
 
           <div className="p-3 rounded-lg bg-black border border-zinc-800 flex flex-col gap-1">
@@ -93,15 +101,18 @@ export function BankingCoreCard({ lastExecution }: BankingCoreCardProps) {
             <span className="text-sm sm:text-base font-bold text-white font-mono">
               {balances.credit}
             </span>
-            <span className="text-[10px] text-zinc-600 font-mono">**** 1042</span>
+            <span className="text-[10px] text-zinc-600 font-mono">
+              **** 1042
+            </span>
           </div>
         </div>
 
-        {/* Last Executed Transaction / Agent Response */}
-        {lastExecution && lastExecution.success && (
+        {lastExecution && (
           <div className="p-3 rounded-lg bg-black border border-zinc-700 flex items-start gap-2.5 text-xs font-mono">
-            <div className="size-4 rounded-full bg-white text-black flex items-center justify-center font-bold shrink-0 mt-0.5">
-              <Check className="size-3 stroke-[3]" />
+            <div className={`size-4 rounded-full flex items-center justify-center font-bold shrink-0 mt-0.5 ${
+              lastExecution.success ? "bg-white text-black" : "bg-zinc-800 text-zinc-300 border border-zinc-600"
+            }`}>
+              {lastExecution.success ? <Check className="size-3 stroke-[3]" /> : <CreditCard className="size-2.5" />}
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="font-semibold text-white">

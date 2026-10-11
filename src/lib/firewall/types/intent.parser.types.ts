@@ -4,6 +4,7 @@ export type BankingAction =
   | "TRANSACTION_HISTORY"
   | "ACCOUNT_INFO"
   | "HELP"
+  | "CONVERSATIONAL"
   | "UNKNOWN";
 
 export interface IntentParams {

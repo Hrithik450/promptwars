@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Activity, ShieldCheck, Flame } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,15 +32,21 @@ export function SessionStatsCard({ stats }: SessionStatsCardProps) {
         {/* Metric Tiles */}
         <div className="grid grid-cols-3 gap-2.5">
           <div className="p-3 rounded-lg bg-black border border-zinc-800 flex flex-col gap-1">
-            <span className="text-zinc-500 text-[11px] font-mono">Requests</span>
+            <span className="text-zinc-500 text-[11px] font-mono">
+              Requests
+            </span>
             <span className="text-lg font-bold text-white font-mono">
               {stats.totalRequests}
             </span>
-            <span className="text-[10px] text-zinc-600 font-mono">Session total</span>
+            <span className="text-[10px] text-zinc-600 font-mono">
+              Session total
+            </span>
           </div>
 
           <div className="p-3 rounded-lg bg-black border border-zinc-800 flex flex-col gap-1">
-            <span className="text-zinc-400 text-[11px] font-mono">Approved</span>
+            <span className="text-zinc-400 text-[11px] font-mono">
+              Approved
+            </span>
             <span className="text-lg font-bold text-white font-mono">
               {stats.approvedCount}
             </span>
@@ -77,11 +82,19 @@ export function SessionStatsCard({ stats }: SessionStatsCardProps) {
                     : "bg-zinc-900 border-zinc-700 text-zinc-300"
                 }`}
               >
-                {stats.trustInfo.trustScore}% &bull; {stats.trustInfo.trustLevel}
+                {stats.trustInfo.trustScore}% &bull;{" "}
+                {stats.trustInfo.trustLevel}
               </Badge>
             </div>
 
-            <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden">
+            <div
+              role="progressbar"
+              aria-valuenow={stats.trustInfo.trustScore}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Session Reputation: ${stats.trustInfo.trustScore} percent`}
+              className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden"
+            >
               <div
                 className="h-full bg-white transition-all duration-500 rounded-full"
                 style={{ width: `${stats.trustInfo.trustScore}%` }}
@@ -89,7 +102,9 @@ export function SessionStatsCard({ stats }: SessionStatsCardProps) {
             </div>
 
             <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
-              <span>Consecutive Blocks: {stats.trustInfo.consecutiveBlocks}</span>
+              <span>
+                Consecutive Blocks: {stats.trustInfo.consecutiveBlocks}
+              </span>
               <span>Scrutiny: {stats.trustInfo.adaptiveScrutiny}</span>
             </div>
           </div>

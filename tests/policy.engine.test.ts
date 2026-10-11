@@ -1,9 +1,9 @@
 import { InputNormalizerService } from "../src/lib/firewall/services/input.normalizer.service";
 import { PatternDetectorService } from "../src/lib/firewall/services/pattern.detector.service";
-import { SemanticClassifierService } from "../src/lib/firewall/services/semantic.classifier.service";
 import { IntentParserService } from "../src/lib/firewall/services/intent.parser.service";
 import { TransactionValidatorService } from "../src/lib/firewall/services/transaction.validator.service";
 import { PolicyEngineService } from "../src/lib/firewall/services/policy.engine.service";
+import { FirewallPolicyRule } from "../src/lib/firewall/types/policy.engine.types";
 
 interface TestReport {
   name: string;
@@ -137,11 +137,11 @@ export function runPolicyEngineTests(): {
 
   function cleanHasPolicy(
     res: ReturnType<typeof evaluateInput>,
-    policy: string,
+    policy: FirewallPolicyRule,
   ) {
     return (
       res.decision.decision === "BLOCK" &&
-      res.decision.triggeredPolicies.includes(policy as any)
+      res.decision.triggeredPolicies.includes(policy)
     );
   }
 

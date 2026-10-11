@@ -5,27 +5,7 @@ import { GET as exportGet } from "../src/app/api/export/route";
 import { AuditStoreService } from "../src/lib/audit/audit.store.service";
 import { NextRequest } from "next/server";
 
-export function runApiEndpointTests() {
-  const reports: { name: string; passed: boolean; error?: string }[] = [];
 
-  function test(name: string, fn: () => void | Promise<void>) {
-    try {
-      const res = fn();
-      if (res instanceof Promise) {
-        throw new Error("Synchronous runner received promise. Use async test runner.");
-      }
-      reports.push({ name, passed: true });
-    } catch (err) {
-      reports.push({
-        name,
-        passed: false,
-        error: err instanceof Error ? err.message : String(err),
-      });
-    }
-  }
-
-  return { reports };
-}
 
 export async function runAsyncApiEndpointTests() {
   const reports: { name: string; passed: boolean; error?: string }[] = [];

@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
-import { Shield, Download, Trash2, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SessionTrustInfo } from "@/lib/audit/audit.store.service";
+import { Shield, Download, Trash2, BarChart2 } from "lucide-react";
 
 interface HeaderProps {
   onOpenBenchmark: () => void;
@@ -66,6 +65,7 @@ export function Header({
             variant="outline"
             size="sm"
             onClick={onOpenBenchmark}
+            aria-label="Open benchmark and calibration suite"
             className="border-zinc-800 bg-zinc-950 text-zinc-300 hover:bg-white hover:text-black hover:border-white transition-colors text-xs h-8 gap-1.5 font-mono"
           >
             <BarChart2 className="size-3.5" />
@@ -76,6 +76,7 @@ export function Header({
             variant="outline"
             size="sm"
             onClick={onExportAuditLog}
+            aria-label="Export audit logs as JSON file"
             className="border-zinc-800 bg-zinc-950 text-zinc-300 hover:bg-white hover:text-black hover:border-white transition-colors text-xs h-8 gap-1.5 font-mono"
           >
             <Download className="size-3.5" />
@@ -88,6 +89,7 @@ export function Header({
             size="sm"
             onClick={onClearSession}
             disabled={totalRequests === 0}
+            aria-label="Clear session history"
             className="text-zinc-500 hover:text-white hover:bg-zinc-900 text-xs h-8 gap-1 font-mono disabled:opacity-40"
           >
             <Trash2 className="size-3.5" />

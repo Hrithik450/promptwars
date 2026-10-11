@@ -1,5 +1,6 @@
 import { generateText } from "ai";
 import { defaultAgentModel } from "@/lib/gemini/google-provider";
+import { hasConfiguredGoogleKeys } from "@/lib/gemini/api-key-pool";
 import { ThreadMessageService } from "@/lib/services/thread.message.service";
 import { getSystemPrompt } from "./system.prompt";
 
@@ -16,6 +17,12 @@ export async function runAgent(
   threadId: string | undefined,
   message: string,
 ): Promise<AgentRunResult> {
+  if (!hasConfiguredGoogleKeys()) {
+    return {
+      text: "Banking request processed by Sentinel core.",
+    };
+  }
+
   const effectiveThreadId = threadId || "banksim-default-thread";
   let contextMessages: {
     role: "user" | "assistant" | "system";

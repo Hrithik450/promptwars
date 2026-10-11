@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { History, ArrowRight } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,7 +47,7 @@ export function HistoryLog({
       </CardHeader>
 
       <CardContent className="px-5 pb-5">
-        <div className="flex flex-col gap-1.5 max-h-60 overflow-y-auto pr-1">
+        <div role="feed" aria-label="Audit records list" className="flex flex-col gap-1.5 max-h-60 overflow-y-auto pr-1">
           {history.map((record) => {
             const isApproved = record.verdict === "APPROVED";
             const isSelected = selectedRequestId === record.requestId;
@@ -57,6 +56,7 @@ export function HistoryLog({
               <button
                 key={record.requestId}
                 onClick={() => onSelectRecord(record)}
+                aria-label={`Inspect audit record: ${record.userInput.slice(0, 30)}, verdict ${record.verdict}, risk ${record.riskScore.toFixed(2)}`}
                 className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left border transition-all text-xs font-mono group ${
                   isSelected
                     ? "bg-zinc-900 border-zinc-600 shadow-sm"

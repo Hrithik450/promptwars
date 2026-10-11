@@ -1,6 +1,5 @@
 import { InputNormalizerService } from "../src/lib/firewall/services/input.normalizer.service";
 import { PatternDetectorService } from "../src/lib/firewall/services/pattern.detector.service";
-import { ThreatCategory } from "../src/lib/firewall/types/pattern.detector.types";
 
 interface TestReport {
   name: string;

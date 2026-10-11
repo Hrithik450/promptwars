@@ -7,6 +7,8 @@ export type PolicyRuleName =
   | "RATE_LIMIT_EXCEEDED"
   | "REPEAT_OFFENDER";
 
+export type FirewallPolicyRule = PolicyRuleName;
+
 export interface PolicyDecision {
   decision: "APPROVE" | "BLOCK";
   triggeredPolicies: PolicyRuleName[];
