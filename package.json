@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx tests/runner.ts"
   },
   "dependencies": {
     "next": "16.4.0",
@@ -24,6 +25,7 @@
     "eslint-config-next": "16.4.0",
     "typescript": "^5",
     "drizzle-kit": "^0.31.11",
-    "@types/pg": "^8.23.1"
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15"
   }
 }
