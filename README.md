@@ -672,7 +672,36 @@ curl -O http://localhost:3000/api/export
 
 ---
 
-## 12. Quickstart & Verification
+## 12. Assumptions Made
+
+The system design, architecture, and security policies are constructed around the following verified assumptions:
+
+1. **Authenticated User Context**:
+   - The interactive banking simulation operates under the default authenticated persona of `alex_mercer` holding a Checking Account ($5,000), Savings Account ($12,000), and Credit Line (-$450).
+   - Self-transfers (transfers to `alex_mercer`) are permitted but explicitly flagged for internal audit notation.
+
+2. **Deterministic Financial Transaction Ceilings**:
+   - Maximum single transfer limit is capped at **$10,000.00 USD**. Any transfer exceeding this value is blocked at Layer 3 regardless of prompt wording or authority pretexting.
+   - All monetary values require strict 2-decimal precision and positive numbers ($> 0$).
+
+3. **Untrusted Input Invariant (Passive Data)**:
+   - All inbound content—including primary prompts, secondary transaction memos, and decoded Base64 payloads—is treated as untrusted passive data. Under no circumstances is user text concatenated directly into executable SQL queries, bash commands, or raw system prompts.
+
+4. **Absolute Deny-by-Default / Fail-Closed Principle**:
+   - In the event of network disruption, Gemini API rate limits, external database disconnects, or classification ambiguity, the firewall unconditionally **fails closed** (Verdict: `BLOCKED`, Risk Score: `1.0`, Threat: `POLICY_VIOLATION`), ensuring zero unauthorized state modification in the banking core.
+
+5. **Conversational Memory Boundaries**:
+   - The AI assistant maintains a rolling 20-message (10 conversational turns) context window per session. Older turns are pruned to prevent context overflow attacks and token budget exhaustion.
+
+6. **Layered Consensus Requirement**:
+   - Legitimate execution requires unanimous consent across the pipeline: Layer 1 pattern risk $< 0.3$, Layer 2 semantic classification `BENIGN` with confidence $\ge 0.7$, and Layer 3 valid structured parameters.
+
+7. **Multi-Model Key Pool Redundancy**:
+   - High availability is achieved by rotating through a pool of Gemini API keys configured in the environment. If any single key or model encounters quota limits or HTTP 429/403 errors, the router automatically fails over to the next healthy model and key without user impact.
+
+---
+
+## 13. Quickstart & Verification
 
 ### Prerequisites
 
