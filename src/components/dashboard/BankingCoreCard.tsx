@@ -97,7 +97,7 @@ export function BankingCoreCard({ lastExecution }: BankingCoreCardProps) {
           </div>
         </div>
 
-        {/* Last Executed Transaction */}
+        {/* Last Executed Transaction / Agent Response */}
         {lastExecution && lastExecution.success && (
           <div className="p-3 rounded-lg bg-black border border-zinc-700 flex items-start gap-2.5 text-xs font-mono">
             <div className="size-4 rounded-full bg-white text-black flex items-center justify-center font-bold shrink-0 mt-0.5">
@@ -105,9 +105,11 @@ export function BankingCoreCard({ lastExecution }: BankingCoreCardProps) {
             </div>
             <div className="flex flex-col gap-0.5">
               <span className="font-semibold text-white">
-                Ledger Transaction Posted:
+                {lastExecution.action === "TRANSFER"
+                  ? "Ledger Transfer & AI Confirmation:"
+                  : "Sentinel Banking Agent Response:"}
               </span>
-              <p className="text-zinc-400 text-[11px] font-sans">
+              <p className="text-zinc-300 text-[12px] font-sans leading-relaxed whitespace-pre-wrap">
                 {lastExecution.message}
               </p>
             </div>

@@ -102,8 +102,11 @@ export function createRoutingGoogleProvider(options: RoutingProviderOptions) {
             );
             return response;
           } catch (error) {
-            // IMPORTANT: If the user simply aborted/cancelled the request, do not penalize the model.
-            if ((error as Error)?.name === "AbortError") {
+            // IMPORTANT: If the user simply aborted/cancelled or timed out the request, do not penalize the model.
+            if (
+              (error as Error)?.name === "AbortError" ||
+              (error as Error)?.name === "TimeoutError"
+            ) {
               throw error;
             }
 
@@ -156,3 +159,17 @@ export const titleProvider = createRoutingGoogleProvider({
   label: "titleGeneration",
 });
 export const defaultTitleModel = titleProvider("gemini-3.5-flash-lite");
+
+// 3. Semantic Classifier Routing
+export const classifierProvider = createRoutingGoogleProvider({
+  models: [
+    "gemini-2.5-flash",
+    "gemini-3.5-flash",
+    "gemini-3.6-flash",
+    "gemini-3.7-flash",
+  ],
+  apiKeys: allKeys,
+  label: "threatClassifier",
+});
+export const defaultClassifierModel = classifierProvider("gemini-2.5-flash");
+
