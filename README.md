@@ -19,17 +19,18 @@
 - [4. The 6-Layer Defense-in-Depth Pipeline](#4-the-6-layer-defense-in-depth-pipeline)
   - [Layer 0: Input Normalizer & Obfuscation Stripper](#layer-0-input-normalizer--obfuscation-stripper)
   - [Layer 1: Regex & Heuristic Pattern Detector](#layer-1-regex--heuristic-pattern-detector)
-  - [Layer 2: Semantic Threat Classifier](#layer-2-semantic-threat-classifier)
+  - [Layer 2: Semantic Threat Classifier & Key Pool](#layer-2-semantic-threat-classifier)
   - [Layer 3: Intent Parser & Financial Validator](#layer-3-intent-parser--financial-validator)
   - [Layer 4: Deterministic Policy Engine](#layer-4-deterministic-policy-engine)
   - [Layer 5: Sandboxed Banking Core & Output Firewall](#layer-5-sandboxed-banking-core--output-firewall)
-- [5. Database Schema & Data Models (ER Diagram)](#5-database-schema--data-models-er-diagram)
-- [6. Adaptive Trust Reputation State Machine](#6-adaptive-trust-reputation-state-machine)
-- [7. UI & Dashboard Component Architecture](#7-ui--dashboard-component-architecture)
-- [8. Threat Vector Taxonomy & Defense Matrix](#8-threat-vector-taxonomy--defense-matrix)
-- [9. Benchmark & Calibration Metrics](#9-benchmark--calibration-metrics)
-- [10. API Specifications](#10-api-specifications)
-- [11. Quickstart & Verification](#11-quickstart--verification)
+- [5. AI Agent Router, Key Pool & 20-Turn Conversation Memory](#5-ai-agent-router-key-pool--20-turn-conversation-memory)
+- [6. Database Schema & Data Models (ER Diagram)](#6-database-schema--data-models-er-diagram)
+- [7. Adaptive Trust Reputation State Machine](#7-adaptive-trust-reputation-state-machine)
+- [8. UI & Dashboard Component Architecture](#8-ui--dashboard-component-architecture)
+- [9. Threat Vector Taxonomy & Defense Matrix](#9-threat-vector-taxonomy--defense-matrix)
+- [10. Benchmark & Calibration Metrics](#10-benchmark--calibration-metrics)
+- [11. API Specifications](#11-api-specifications)
+- [12. Quickstart & Verification](#12-quickstart--verification)
 
 ---
 
@@ -44,13 +45,13 @@ Traditional single-layer defenses (e.g., system prompt hardening or basic keywor
 - **Secondary Instruction Smuggling**: Benign transfer requests bearing malicious instructions in transaction memo fields.
 - **Honeypot Canary Extraction**: Snooping on system prompts to exfiltrate secret canary credentials.
 
-**BankSim** solves this with a **6-Layer Defense-in-Depth Pipeline** operating under an absolute **Deny-by-Default, Fail-Closed Architecture**. User prompts are evaluated strictly as **passive data**, never executable instructions. If any layer identifies a threat, execution halts immediately with zero impact on the banking core.
+**BankSim** solves this with a **6-Layer Defense-in-Depth Pipeline** operating under an absolute **Deny-by-Default, Fail-Closed Architecture**. User prompts are evaluated strictly as **passive data**, never executable instructions. If any layer identifies a threat, execution halts immediately with zero impact on the banking core or AI model.
 
 ---
 
 ## 2. High-Level System Architecture
 
-The following diagram illustrates the high-level boundary separation between client requests, firewall analysis, mock banking ledger, and persistent database storage:
+The following diagram illustrates the high-level boundary separation between client requests, firewall analysis, mock banking ledger, AI agent router, and persistent database storage:
 
 ```mermaid
 flowchart TD
@@ -68,14 +69,15 @@ flowchart TD
     subgraph Firewall["BankSim Blue-Team AI Firewall"]
         L0["Layer 0: Input Normalizer\n• NFKC Homoglyphs • Zero-Width Strip\n• Recursive B64/URL/Hex • Leetspeak"]
         L1["Layer 1: Pattern Detector & Heuristics\n• 28+ Signatures • Multilingual Engine\n• Canary Token Detector • Shannon Entropy"]
-        L2["Layer 2: Semantic Classifier\n• Fast Cosine Similarity Engine\n• Adversarial Embeddings Clustering"]
+        L2["Layer 2: Semantic Classifier\n• Rotating Gemini Key Pool (Keys 1-6)\n• Deterministic Offline Heuristics Fallback"]
         L3["Layer 3: Intent & Financial Validator\n• Slot Filling • $10,000 Ceiling\n• Memo Re-Scanning • Strict Whitelist"]
         L4["Layer 4: Policy Engine & Consensus\n• Deny-by-Default • Rate Throttling\n• Adaptive Session Trust Scrutiny"]
         L5["Layer 5: Output Firewall & Assembler\n• PII Masking • Canary Token Stripper\n• Risk Score Formulation"]
     end
 
-    subgraph Core["Sandboxed Banking Core"]
+    subgraph Core["Sandboxed Banking Core & AI Agent Router"]
         Ledger["Mock Banking Ledger\n• Checking ($5,000) • Savings ($12,000)\n• Credit Line (-$450)"]
+        AgentRouter["Sentinel AI Agent Router\n• Live Gemini Multi-Model Routing\n• Rolling 20-Turn Conversation Memory\n• Rotating 6-Key Pool"]
     end
 
     subgraph Storage["Persistence Tier (PostgreSQL + Drizzle)"]
@@ -92,7 +94,8 @@ flowchart TD
     L3 --> L4
     L4 -->|"FAIL-CLOSED (Block)"| L5
     L4 -->|"PASSED (Approve)"| Ledger
-    Ledger --> L5
+    Ledger --> AgentRouter
+    AgentRouter --> L5
     L5 -->|"Audit record"| DB_Logs
     Ledger -.->|"Balance updates"| DB_Accts
     Ledger -.->|"Completed TXs"| DB_Tx
@@ -105,7 +108,7 @@ flowchart TD
 
 ## 3. End-to-End Request Lifecycle (Sequence Diagram)
 
-The sequence diagram details the operational flow for both **Adversarial Interception** (fast fail-closed exit) and **Benign Execution** (full traversal to core ledger):
+The sequence diagram details the operational flow for both **Adversarial Interception** (fast fail-closed exit) and **Benign Execution** (full traversal to core ledger and Gemini AI Router):
 
 ```mermaid
 sequenceDiagram
@@ -118,6 +121,7 @@ sequenceDiagram
     participant L2_3 as Layers 2-3 (Semantics & Intent)
     participant L4 as Layer 4 (Policy Engine)
     participant Core as Mock Banking Core
+    participant Agent as AI Agent Router (Gemini)
     participant Store as Audit Store & Postgres
 
     Note over Attacker, Store: SCENARIO A: Adversarial Jailbreak Attempt
@@ -126,10 +130,10 @@ sequenceDiagram
     API->>Pipe: analyze(rawInput, sessionId)
     Pipe->>L0_1: normalize() & detect()
     L0_1-->>Pipe: Pattern Match [SYS_OVERRIDE_01], Risk: 0.95
-    Note over Pipe: Fast-Exit Optimization (L1 Risk >= 0.90)
+    Note over Pipe: Fast-Exit Optimization (L1 Risk >= 0.85 skips Layer 2)
     Pipe->>L4: evaluatePolicy(highRisk)
     L4-->>Pipe: Policy Decision: BLOCKED (Critical Risk)
-    Note over Pipe: HALT: Mock Banking Core is NEVER contacted
+    Note over Pipe: HALT: Mock Banking Core & AI Model are NEVER contacted
     Pipe->>Store: Persist immutable audit log (BLOCKED)
     Pipe-->>API: FirewallVerdictResponse { verdict: "BLOCKED", risk: 0.95 }
     API-->>UI: 200 OK (BLOCKED, diagnostics details)
@@ -147,10 +151,13 @@ sequenceDiagram
     L4-->>Pipe: Policy Decision: APPROVED (Consensus satisfied)
     Pipe->>Core: executeTransfer(50, "alice", "lunch")
     Core-->>Pipe: Execution OK: Checking balance $5,000 -> $4,950
+    Pipe->>Agent: runAgent(sessionId, rawInput)
+    Note over Agent: Loads rolling 20-message memory & queries rotating Gemini key pool
+    Agent-->>Pipe: Text confirmation & conversational banking reply
     Pipe->>Store: Persist immutable audit log (APPROVED)
     Pipe-->>API: FirewallVerdictResponse { verdict: "APPROVED", executionResult }
-    API-->>UI: 200 OK (APPROVED, new balance, updated ledger)
-    UI-->>Attacker: Status Approved, ledger log updated in real time
+    API-->>UI: 200 OK (APPROVED, new balance, AI assistant reply)
+    UI-->>Attacker: Status Approved, ledger and AI assistant response updated in real time
 ```
 
 ---
@@ -324,7 +331,64 @@ flowchart LR
 
 ---
 
-## 5. Database Schema & Data Models (ER Diagram)
+## 5. AI Agent Router, Key Pool & 20-Turn Conversation Memory
+
+When user requests are validated as `APPROVED` by the 6-layer firewall, they are dynamically dispatched to the **Sentinel AI Agent Router**. This router replaces static rule-based templates with live Google Gemini generation while preserving deterministic banking security.
+
+### Architecture Overview
+
+```mermaid
+flowchart TD
+    subgraph ClientSession["Client Conversation Session"]
+        UserReq["Approved User Query\n(e.g., 'Can I transfer $50 to Alice?')"]
+        FollowUp["Multi-Turn Follow-Up\n(e.g., 'How much did I just send to Alice?')"]
+    end
+
+    subgraph Memory["Rolling Thread Context Store"]
+        Store["thread.message.service.ts\n• Window Size: 20 Messages (10 Turns)\n• Ephemeral & In-Memory / PostgreSQL Synced\n• Full Conversational History Retained"]
+    end
+
+    subgraph Router["Agent Dispatcher & Multi-Key Pool"]
+        Pool["GoogleApiKeyPool\n• GENERAL_GEMINI_API_KEYS (6 Distinct Keys)\n• Active Round-Robin Acquisition\n• Cooldown: 60s (Model) | 90s (Full Key)"]
+        
+        subgraph FallbackLadder["Dynamic Model Fallback Ladder"]
+            M1["gemini-2.5-flash (Primary)"] -->|403 / 503 / 429| M2["gemini-3.5-flash"]
+            M2 -->|Quota / Latency| M3["gemini-3.6-flash"]
+            M3 -->|Fallback| M4["gemini-3.7-flash"]
+            M4 -->|Fallback| M5["gemini-3.8-flash"]
+        end
+    end
+
+    subgraph Guardrails["Zero-Overhead Direct Text Response"]
+        Prompt["Sentinel Banking System Prompt\n• Strict financial assistant persona\n• No internal thoughts leakage\n• No tool calling attack surface\n• Direct markdown text output"]
+    end
+
+    UserReq --> Store
+    FollowUp --> Store
+    Store --> Router
+    Pool --> FallbackLadder
+    FallbackLadder --> Guardrails
+    Guardrails --> Output["Natural AI Banking Assistant Response\n(Delivered to BankingCoreCard & VerdictPanel)"]
+```
+
+### Key Capabilities
+
+1. **20-Message Rolling Context Window**:
+   - Maintains state across turns for seamless multi-turn interactions (e.g., confirming recipients, clarifying accounts, reviewing prior transfers).
+   - Prevents prompt bloat by pruning conversations older than 20 messages.
+   - Requires zero complex multi-tab UI overhead; single unified thread session.
+
+2. **Autonomous Key Pool & Cooldown Management**:
+   - Rotates through a pool of 6 Gemini API keys configured via `GENERAL_GEMINI_API_KEYS`.
+   - If an API key encounters an HTTP 403 (e.g. project spend cap breached) or 429 rate limit, the router cools down the model/key and seamlessly switches to the next available key without failing the user's request.
+
+3. **Tool-Free & Thought-Free Hardening**:
+   - Stripped of thought generation and client-callable tools to eliminate secondary tool injection vectors.
+   - Sub-second direct response latency for responsive conversational banking.
+
+---
+
+## 6. Database Schema & Data Models (ER Diagram)
 
 The application uses **Drizzle ORM** with **PostgreSQL** to maintain an immutable audit trail and real-time banking ledger:
 
@@ -373,7 +437,7 @@ erDiagram
 
 ---
 
-## 6. Adaptive Trust Reputation State Machine
+## 7. Adaptive Trust Reputation State Machine
 
 BankSim monitors user session reputation in real time, calculating an adaptive trust score ($0$–$100\%$) and adjusting scrutiny levels dynamically:
 
@@ -412,7 +476,7 @@ stateDiagram-v2
 
 ---
 
-## 7. UI & Dashboard Component Architecture
+## 8. UI & Dashboard Component Architecture
 
 The frontend is built using **Next.js 16 App Router**, **Tailwind CSS v4**, and **shadcn UI** primitives styled with a strictly monochrome, high-contrast black and white theme:
 
@@ -447,7 +511,7 @@ flowchart TD
 
 ---
 
-## 8. Threat Vector Taxonomy & Defense Matrix
+## 9. Threat Vector Taxonomy & Defense Matrix
 
 | Attack Category | Adversarial Technique | Example Payload Vector | Intercepting Layer | Primary Rule ID | Defensive Action |
 |:---|:---|:---|:---:|:---:|:---:|
@@ -466,7 +530,7 @@ flowchart TD
 
 ---
 
-## 9. Benchmark & Calibration Metrics
+## 10. Benchmark & Calibration Metrics
 
 The firewall was evaluated against a benchmark battery comprising **28 distinct adversarial attack vectors** and **10 legitimate benign banking queries**:
 
@@ -489,7 +553,7 @@ The firewall was evaluated against a benchmark battery comprising **28 distinct 
 
 ---
 
-## 10. API Specifications
+## 11. API Specifications
 
 ### 1. `POST /api/analyze`
 Submits a prompt through the 6-layer defense pipeline.
@@ -584,7 +648,7 @@ curl -O http://localhost:3000/api/export
 
 ---
 
-## 11. Quickstart & Verification
+## 12. Quickstart & Verification
 
 ### Prerequisites
 - Node.js >= 20.0
