@@ -83,6 +83,16 @@ export function createRoutingGoogleProvider(options: RoutingProviderOptions) {
             lastResponse = response;
 
             if (!response.ok) {
+              if (response.status === 403 || response.status === 429) {
+                // Key-level quota/spend limit: cool down key and switch immediately to next key in pool
+                pool.markRateLimited(apiKey, 90_000);
+                serverWarn(
+                  `[Router${logLabel}] Cause: HTTP ${response.status} (Key Limit) | Switched: API Key | Cooldown: 90s for entire ${pool.label(apiKey)}`,
+                );
+                keyFailedCompletely = false;
+                break; // Try next API key immediately!
+              }
+
               markModelCooldown(apiKey, currentModel, 60_000);
               serverWarn(
                 `[Router${logLabel}] Cause: HTTP ${response.status} | Switched: Model | Cooldown: 60s for ${currentModel} on ${pool.label(apiKey)}`,
@@ -111,9 +121,24 @@ export function createRoutingGoogleProvider(options: RoutingProviderOptions) {
             }
 
             lastError = error;
-            markModelCooldown(apiKey, currentModel, 60_000);
             const errStr =
               error instanceof Error ? error.message : "Unknown Error";
+
+            if (
+              errStr.includes("403") ||
+              errStr.includes("429") ||
+              errStr.includes("Spend cap") ||
+              errStr.includes("RESOURCE_EXHAUSTED")
+            ) {
+              pool.markRateLimited(apiKey, 90_000);
+              serverWarn(
+                `[Router${logLabel}] Cause: ${errStr} (Key Limit) | Switched: API Key | Cooldown: 90s for entire ${pool.label(apiKey)}`,
+              );
+              keyFailedCompletely = false;
+              break; // Try next API key immediately!
+            }
+
+            markModelCooldown(apiKey, currentModel, 60_000);
             serverWarn(
               `[Router${logLabel}] Cause: ${errStr} | Switched: Model | Cooldown: 60s for ${currentModel} on ${pool.label(apiKey)}`,
             );
@@ -150,7 +175,7 @@ export const agentProvider = createRoutingGoogleProvider({
   apiKeys: allKeys,
   label: "textGeneration",
 });
-export const defaultAgentModel = agentProvider("gemini-2.5-flash");
+export const defaultAgentModel = agentProvider("gemini-3.5-flash-lite");
 
 // 2. Thread Title Generation Routing
 export const titleProvider = createRoutingGoogleProvider({
@@ -172,4 +197,3 @@ export const classifierProvider = createRoutingGoogleProvider({
   label: "threatClassifier",
 });
 export const defaultClassifierModel = classifierProvider("gemini-2.5-flash");
-
