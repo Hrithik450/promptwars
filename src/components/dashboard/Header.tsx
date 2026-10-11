@@ -16,7 +16,7 @@ interface HeaderProps {
 }
 
 const NAV_LINKS = [
-  { href: "/", label: "Console" },
+  { href: "/console", label: "Console" },
   { href: "/architecture", label: "Architecture" },
   { href: "/benchmark", label: "Benchmark Lab" },
   { href: "/audit", label: "Audit Trail" },
