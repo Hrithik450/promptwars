@@ -12,16 +12,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/api/firewall`,
+      url: `${baseUrl}/architecture`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/benchmark`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/audit`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/policies`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/api/benchmark`,
+      url: `${baseUrl}/docs`,
       lastModified: now,
       changeFrequency: "weekly",
-      priority: 0.7,
+      priority: 0.8,
     },
   ];
 }

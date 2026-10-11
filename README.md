@@ -11,12 +11,28 @@
 
 ---
 
+## 🎯 Challenge Submission & Vertical Overview
+
+| Submission Criteria | Specification / Details |
+| :--- | :--- |
+| **Public Repository** | [https://github.com/Hrithik450/promptwars](https://github.com/Hrithik450/promptwars) |
+| **Branch Architecture** | **Single Branch (`main`)** — Strictly zero auxiliary branches |
+| **Repository Size** | **~2.5 MB** — Well below the 10 MB ceiling |
+| **Chosen Challenge Vertical** | **Financial Services / Autonomous Banking AI Assistant & Security Firewall** |
+| **Persona & Agent Role** | **Sentinel Banking AI** — Context-aware financial assistant with 6-layer fail-closed protection |
+| **Approach & Decision Logic** | Multi-Layer Defense-in-Depth (L0–L5) with consensus gating, adaptive reputation scoring, and fast fail-closed rejection |
+| **Implementation** | Next.js 16 (Turbopack), TypeScript, Drizzle ORM, Tailwind CSS v4, Google Gemini multi-key pool |
+| **Test Validation** | 226/226 automated unit & integration tests passing in ~2.1 seconds |
+
+---
+
 ## 📑 Table of Contents
 
-- [1. Executive Summary & Threat Landscape](#1-executive-summary--threat-landscape)
+- [🎯 Challenge Submission & Vertical Overview](#-challenge-submission--vertical-overview)
+- [1. Executive Summary & Chosen Vertical](#1-executive-summary--chosen-vertical)
 - [2. High-Level System Architecture](#2-high-level-system-architecture)
-- [3. End-to-End Request Lifecycle (Sequence Diagram)](#3-end-to-end-request-lifecycle-sequence-diagram)
-- [4. The 6-Layer Defense-in-Depth Pipeline](#4-the-6-layer-defense-in-depth-pipeline)
+- [3. End-to-End Request Lifecycle & How the Solution Works](#3-end-to-end-request-lifecycle--how-the-solution-works)
+- [4. The 6-Layer Defense-in-Depth Pipeline (Approach & Logic)](#4-the-6-layer-defense-in-depth-pipeline-approach--logic)
   - [Layer 0: Input Normalizer & Obfuscation Stripper](#layer-0-input-normalizer--obfuscation-stripper)
   - [Layer 1: Regex & Heuristic Pattern Detector](#layer-1-regex--heuristic-pattern-detector)
   - [Layer 2: Semantic Threat Classifier & Key Pool](#layer-2-semantic-threat-classifier)
@@ -30,11 +46,12 @@
 - [9. Threat Vector Taxonomy & Defense Matrix](#9-threat-vector-taxonomy--defense-matrix)
 - [10. Benchmark & Calibration Metrics](#10-benchmark--calibration-metrics)
 - [11. API Specifications](#11-api-specifications)
-- [12. Quickstart & Verification](#12-quickstart--verification)
+- [12. Assumptions Made](#12-assumptions-made)
+- [13. Quickstart & Verification](#13-quickstart--verification)
 
 ---
 
-## 1. Executive Summary & Threat Landscape
+## 1. Executive Summary & Chosen Vertical
 
 Autonomous AI financial agents face an existential vulnerability: **Prompt Injection**. Attackers exploit LLM malleability to bypass safeguards, manipulate account balances, exfiltrate confidential credentials, and smuggle instructions via secondary parameters such as payment transaction memos.
 
