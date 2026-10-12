@@ -104,6 +104,11 @@ export default function RootLayout({
         <WebsiteJsonLd />
         <SoftwareApplicationJsonLd />
         <FAQJsonLd />
+        <script
+          src="https://www.neylonai.tech/v1/widget.js?v=3.8"
+          data-key="nk_live_JAIploxgvZyl5_6HBPRr4TJLol4iMsX7"
+          async
+        />
       </head>
       <body className={`${bricolage.className} min-h-full flex flex-col font-sans bg-black text-white selection:bg-white selection:text-black`}>
         {children}
